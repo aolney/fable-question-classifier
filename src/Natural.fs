@@ -11,12 +11,12 @@ let inline private (~%) x = createObj x
 let inline private (=>) x y = x ==> y
 
 //let basePath = "/z/aolney/repos/FableSpeechActClassifier/node_modules/natural/lib/natural/brill_pos_tagger/data/English/"
-let rulePath = "tr_from_posjs.txt";
-let lexiconPath = "lexicon_from_posjs.json";
+// let rulePath = "tr_from_posjs.txt";
+// let lexiconPath = "lexicon_from_posjs.json";
 
-let configureBrowserFS : unit -> unit = import "configureBrowserFS" "../public/browserfs.config.js"
-let listFiles : unit -> unit = import "listFiles" "../public/browserfs.config.js"
-let localStorageTest : unit -> unit = import "localStorageTest" "../public/browserfs.config.js"
+// let configureBrowserFS : unit -> unit = import "configureBrowserFS" "../public/browserfs.config.js"
+// let listFiles : unit -> unit = import "listFiles" "../public/browserfs.config.js"
+// let localStorageTest : unit -> unit = import "localStorageTest" "../public/browserfs.config.js"
 
 
 //SentenceTokenizer
