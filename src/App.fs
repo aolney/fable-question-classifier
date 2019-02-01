@@ -29,7 +29,7 @@ type Msg =
 
 let init () : Model * Cmd<Msg> =
   //Natural.localStorageTest ()
-  Natural.configureBrowserFS ()
+  //Natural.configureBrowserFS ()
   {Input="A little blue-and-black fish swims up to a mirror. It maneuvers its body vertically to reflect its belly, along with a brown mark that researchers have placed on its throat."; Output=""}, []
 
 // Update
@@ -40,8 +40,10 @@ let update msg model =
       //Recover sentences
       let sentenceTokenizer = Natural.exports.SentenceTokenizer.Create()
       let wordTokenizer = Natural.exports.WordTokenizer.Create()
-      let lexicon = Natural.exports.Lexicon.Create( Natural.lexiconPath, "N")
-      let rules = Natural.exports.RuleSet.Create( Natural.rulePath)
+      // let lexicon = Natural.exports.Lexicon.Create( Natural.lexiconPath, "N")
+      // let rules = Natural.exports.RuleSet.Create( Natural.rulePath)
+      let lexicon = Natural.exports.Lexicon.Create( "EN", "N")
+      let rules = Natural.exports.RuleSet.Create( "EN" )
       let tagger = Natural.exports.BrillPOSTagger.Create( lexicon, rules )
 
       let taggedSentences =

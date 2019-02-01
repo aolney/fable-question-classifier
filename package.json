@@ -13,7 +13,7 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "browserfs": "^1.4.3",
-    "natural": "^0.6.2",
+    "natural": "^0.6.3",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "remotedev": "^0.2.7"
