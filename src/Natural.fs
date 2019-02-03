@@ -25,7 +25,7 @@ type [<AllowNullLiteral>] SentenceTokenizer =
     abstract tokenize : string -> string []
 and [<AllowNullLiteral>] SentenceTokenizerStatic =
     [<Emit("new $0($1...)")>] abstract Create: unit -> SentenceTokenizer
-//TODO: I would like to do this; at one point it was working. Using IExports as a workaround
+//TODO: I would like to use a call like this; at one point it was working. Using IExports as a workaround
 //let [<Import("SentenceTokenizer",from="natural")>] SentenceTokenizer : SentenceTokenizerStatic = jsNative
 
 //WordTokenizer

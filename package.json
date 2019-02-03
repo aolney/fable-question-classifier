@@ -5,15 +5,16 @@
   "scripts": {
     "build": "webpack -p",
     "start": "webpack-dev-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "gh-pages -d public"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["question","classifier"],
+  "author": "Andrew M. Olney",
+  "license": "Apache-2.0",
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "browserfs": "^1.4.3",
-    "natural": "^0.6.3",
+    "natural": "git+https://git@github.com/NaturalNode/natural.git",
     "react": "^15.6.2",
     "react-dom": "^15.6.2",
     "remotedev": "^0.2.7"
@@ -27,6 +28,7 @@
     "css-loader": "^0.28.7",
     "fable-loader": "^1.1.2",
     "fable-utils": "^1.0.6",
+    "gh-pages": "^2.0.1",
     "loglevel": "^1.5.0",
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
