@@ -35,6 +35,21 @@ type [<AllowNullLiteral>] WordTokenizer =
 and [<AllowNullLiteral>] WordTokenizerStatic =
     [<Emit("new $0($1...)")>] abstract Create: unit -> WordTokenizer
 
+//TreebankWordTokenizer
+type [<AllowNullLiteral>] TreebankWordTokenizer =
+    /// Warning: this tokenizer appears to be pretty stupid (model-free)
+    abstract tokenize : string -> string []
+and [<AllowNullLiteral>] TreebankWordTokenizerStatic =
+    [<Emit("new $0($1...)")>] abstract Create: unit -> TreebankWordTokenizer
+
+//WordPunctTokenizer
+type [<AllowNullLiteral>] WordPunctTokenizer =
+    /// Warning: this tokenizer appears to be pretty stupid (model-free)
+    abstract tokenize : string -> string []
+and [<AllowNullLiteral>] WordPunctTokenizerStatic =
+    [<Emit("new $0($1...)")>] abstract Create: unit -> WordPunctTokenizer
+
+
 //Lexicon
 type [<AllowNullLiteral>] Lexicon = class end
 and [<AllowNullLiteral>] LexiconStatic =
@@ -45,9 +60,18 @@ type [<AllowNullLiteral>] RuleSet = class end
 and [<AllowNullLiteral>] RuleSetStatic =
     [<Emit("new $0($1...)")>] abstract Create: string -> RuleSet
 
+type TaggedWord =
+    {
+        token : string
+        tag : string
+    }
+type TaggedSentence =
+    {
+        taggedWords : TaggedWord []
+    }
 //BrillPOSTagger
 type [<AllowNullLiteral>] BrillPOSTagger =
-    abstract tag : string [] -> string []
+    abstract tag : string [] -> TaggedSentence
 and [<AllowNullLiteral>] BrillPOSTaggerStatic =
     [<Emit("new $0($1...)")>] abstract Create: Lexicon * RuleSet -> BrillPOSTagger
 
@@ -56,6 +80,8 @@ and [<AllowNullLiteral>] BrillPOSTaggerStatic =
 type [<AllowNullLiteral>] IExports =
     abstract SentenceTokenizer: SentenceTokenizerStatic
     abstract WordTokenizer : WordTokenizerStatic
+    abstract TreebankWordTokenizer : TreebankWordTokenizerStatic
+    abstract WordPunctTokenizer : WordPunctTokenizerStatic
     abstract BrillPOSTagger: BrillPOSTaggerStatic
     abstract Lexicon: LexiconStatic
     abstract RuleSet: RuleSetStatic

@@ -1,6 +1,6 @@
 # Fable Speech Act Classifier
 
-## STATUS: IN PROGRESS/NOT FUNCLICENSETIONAL
+## STATUS: IN PROGRESS/NOT FUNCTIONAL
 
 This code is a reimplementation of [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) written in `tcl`.
 

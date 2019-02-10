@@ -8,7 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "publish": "gh-pages -d public"
   },
-  "keywords": ["question","classifier"],
+  "keywords": [
+    "question",
+    "classifier"
+  ],
   "author": "Andrew M. Olney",
   "license": "Apache-2.0",
   "dependencies": {
@@ -33,7 +36,8 @@
     "node-sass": "^4.5.3",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.18.2",
-    "webpack": "^3.6.0",
-    "webpack-dev-server": "^2.8.2"
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
   }
 }

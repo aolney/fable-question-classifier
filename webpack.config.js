@@ -21,6 +21,7 @@ var isProduction = process.argv.indexOf("-p") >= 0;
 console.log("Bundling for " + (isProduction ? "production" : "development") + "...");
 
 module.exports = {
+    mode : "development",
     devtool: isProduction ? undefined : "source-map",
     entry: resolve('./src/FableSpeechActClassifier.fsproj'),
     output: {
