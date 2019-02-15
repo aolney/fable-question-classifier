@@ -11,6 +11,9 @@ open Elmish.React
 open Elmish.Debug
 open Elmish.HMR
 open Elmish
+open System.IO
+
+open Fulma
 
 //open Elmish.Browser.Navigation
 //open Elmish.Browser.UrlParser
@@ -32,27 +35,36 @@ let tagger = Natural.exports.BrillPOSTagger.Create( lexicon, rules )
 
 // Domain
 // ---------------------------------------
+type Mode =
+    | FreeText 
+    | TagOnly 
+    | TabDelimited
+
 type Model = 
   {
     Input : string
     Output : string
+    Mode : Mode
   }
 
 type Msg =
-  | ProcessInput
-  | UpdateInput of string
+    | ProcessInput
+    | ModeChange of Mode
+    | UpdateInput of string
 
 let init () : Model * Cmd<Msg> =
   //
   //Natural.localStorageTest ()
   //Natural.configureBrowserFS ()
   //({Input="A little blue-and-black fish swims up to a mirror. It maneuvers its body vertically to reflect its belly, along with a brown mark that researchers have placed on its throat."; Output=""}, [])
-  ({Input="Whom did you ask? Did you ever have a reason to think that the sandwhich which you compared to a lemming might know how to test or assess the characteristic frequency of an unladen swallow? Shouldn't you guess? Don't you think you haven't? Won't you at least try? What was its name? Why do you think that?"; Output=""}, [])
+  ({Mode=Mode.FreeText; Input="Whom did you ask? Did you ever have a reason to think that the sandwhich which you compared to a lemming might know how to test or assess the characteristic frequency of an unladen swallow? Shouldn't you guess? Don't you think you haven't? Won't you at least try? What was its name? Why do you think that?"; Output=""}, [])
 
 // Update
 // ---------------------------------------
 let update msg model =
   match msg with
+  | ModeChange( newMode ) -> 
+    ({ model with Mode = newMode}, [])
   | UpdateInput(input) ->
       ({ model with Input = input}, [])
   | ProcessInput ->
@@ -62,25 +74,37 @@ let update msg model =
         |> Array.map( fun s -> 
           let taggedSentence = s |> wordTokenizer.tokenize |> tagger.tag 
           let flatTaggedSentence = taggedSentence.taggedWords |> Array.map( fun tw -> tw.token + "/" + tw.tag ) |> String.concat " "
-          let transformedSetence,matches = flatTaggedSentence |> QuestionClassifier.ApplyCascade
-          transformedSetence
+          let questionClassification,matches = flatTaggedSentence |> QuestionClassifier.Classify QuestionClassifier.ClassificationMode.Monothetic  QuestionClassifier.IndirectQuestionMode.Relaxed
+          (questionClassification, matches)
         )
 
+      let TokenizeTag (text:string) = 
+        text +  " " //pad with white space b/c of bug
+        |> sentenceTokenizer.tokenize
+        |> Array.map( fun s -> 
+          let taggedSentence = s |> wordTokenizer.tokenize |> tagger.tag 
+          let flatTaggedSentence = taggedSentence.taggedWords |> Array.map( fun tw -> tw.token + "/" + tw.tag ) |> String.concat " "
+          flatTaggedSentence
+        )
 
-      let output =
-        //presence of tabs indicates last column is text to process
-        if model.Input.Contains("\t") then
-          let dummy =
+      let TabbedInput (text:string) =
+        let rowCols =
             model.Input.Split('\n')
             |> Array.map( fun row ->
-              let s = row.Split('\t')
-              let tagged = s.[s.Length-1] |> TokenizeTagClassify
-
-              row + "\t" + (tagged |> toJson)
+              row.Split('\t')
             )
-          dummy |> toJson
-        else
-          model.Input |> TokenizeTagClassify |> toJson
+        let inputRows = 
+          rowCols
+          |> Seq.map( fun a -> a |> Array.last)
+        //
+        inputRows 
+
+      let output = 
+        match model.Mode with
+        | FreeText -> model.Input |> TokenizeTagClassify |> toJson
+        | TagOnly -> model.Input |> TokenizeTag |> toJson
+        | TabDelimited -> model.Input |> TabbedInput |> toJson
+        
       ({model with Output=output}, [])
 
 // View
@@ -97,8 +121,18 @@ let view model dispatch =
   div [ ClassName "columns is-vcentered" ] [ 
     div [ ClassName "column" ] [ 
       h1 [ ClassName "title"] [ str "Question Classifier"]
+      //https://github.com/fable-compiler/repl/blob/master/public/samples/fulma/dropdown.fs
+      Field.div [ ]
+                [ Label.label [ ]
+                    [ str "Mode" ]
+                  Control.div [ ]
+                     [ Select.select [ Select.Props [ OnClick (fun ev  -> ModeChange(!!ev.target?value) |> dispatch) ] ]
+                        [ select [ DefaultValue model.Mode ]
+                            [ option [ Value Mode.FreeText ] [ str "Free text" ]
+                              option [ Value Mode.TabDelimited ] [ str "Tab delimited" ]
+                              option [ Value Mode.TagOnly ] [ str "Tag only" ] ] ] ] ]
       div [ ClassName "content"] [
-        p [] [ str "Enter your text here. Sentences will be tokenized using simple punctuation and individually classified. If input contains tabs it will be treated as tab delimited with the last column as text input." ]
+        p [] [ str "Enter your text here. In Free text mode, sentences will be tokenized using simple punctuation and individually classified. In Tab delimited mode, it will be treated as tab delimited with the last column as text input." ]
         textarea [
                     ClassName "input"
                     DefaultValue model.Input

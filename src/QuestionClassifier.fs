@@ -21,8 +21,9 @@ let features =
          Pattern = @"\b[Hh]ow/[A-Z]+"
          Replace = true
      }
+     //Underscore b/c Biber has WHO category
      {
-         Name = "WHO"
+         Name = "WHO_"
          Pattern = @"\b([Ww]ho|[Ww]hose|[Ww]hom)/[A-Z]+"
          Replace = true
      }
@@ -203,6 +204,11 @@ let features =
          Replace = true
      }
      {
+         Name = "WHO"
+         Pattern = @"\b([Ww]hat|[Ww]here|[Ww]hen|[Hh]ow|[Ww]hether|[Ww]hy|[Ww]hoever|[Ww]homever|[Ww]hichever|[Ww]herever|[Ww]henever|[Ww]hatever|[Hh]owever)/[A-Z\$]+" 
+         Replace = true
+     }
+     {
          Name = "ART"
          Pattern = @"\b([Aa]|[Aa]n|[Tt]he)/[A-Z]+"
          Replace = true
@@ -285,8 +291,17 @@ let features =
          Pattern = @"\bTELL OBJPRO WHAT"
          Replace = true
      }
-     //Non question transformation happens here logically
      //begin non-replacing patterns
+     {
+         Name = "VERIFICATION"
+         Pattern = @"\b(MODAL|WOULD|SHOULD|DO|HAVE|BE)"
+         Replace = false
+     }
+     {
+         Name = "CONCEPTCOMPLETION"
+         Pattern = @"(^|ALL-P)[ ]?(WHAT|WHO_|WHERE|WHEN|WHICH)"
+         Replace = false
+     }
      {
          Name = "DEFINITION"
          Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)([^#]*#?[^#]*(#SPECIAL|#DEFINITION)|[ ]?(DET )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP))|^ (MODAL|WOULD) YOU[^#]*#?[^#]*(#SPECIAL|#DEFINITION)|WHAT (DET )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP) BE"
@@ -357,16 +372,7 @@ let features =
          Pattern = @"(#SPECIAL|#INTERPRETATION)"
          Replace = false
      }
-     {
-         Name = "CONCEPTCOMPLETION"
-         Pattern = @"(^|ALL-P)[ ]?(WHAT|WHO_|WHERE|WHEN|WHICH)"
-         Replace = false
-     }
-     {
-         Name = "VERIFICATION"
-         Pattern = @"\b(MODAL|WOULD|SHOULD|DO|HAVE|BE)"
-         Replace = false
-     }
+
  ]
 
 let casscade,patterns =
@@ -381,9 +387,14 @@ let ApplyCascade( taggedSentence : string ) =
     let matches = ResizeArray<string>()
     let mutable temp = taggedSentence
     for name,regex,_ in casscade do
-        if regex.IsMatch( temp ) then
+        //count the matches
+        for _ in regex.Matches( temp ) do
             matches.Add( name )
-            temp <- regex.Replace( temp, name )
+        //transform the string
+        temp <- regex.Replace( temp, name )
+        // if regex.IsMatch( temp ) then
+        //     matches.Add( name )
+        //     temp <- regex.Replace( temp, name )
     //
     (temp,matches)
 
@@ -396,40 +407,80 @@ let ApplyPatterns( taggedSentence : string ) =
     //
     matches
 
+let questionRegex = System.Text.RegularExpressions.Regex("^(PREP )?(WHO|WHO_|WHAT|HOW|WHY|WHERE|WHEN|WHP|MODAL|DO|HAVE|BE|SHOULD|#KEYS_SPECIAL|#KEYS_JUDGEMENTAL|WOULD|WHICH).*")
+let whRegex = System.Text.RegularExpressions.Regex("(WHO|WHO_|WHAT|HOW|WHY|WHERE|WHEN|WHP)")
+let doHaveRegex = System.Text.RegularExpressions.Regex("(MODAL|DO|HAVE|BE)")
+
+///If the input is not a canoncial question, see if question indicators are present and prepend them to the front if so
+let ForceIndirectQuestion( input ) =
+    if questionRegex.IsMatch( input ) |> not then
+        let whMatches = whRegex.Match(input)
+        let dhMatches = doHaveRegex.Match(input)
+        if whMatches.Success then
+            whMatches.Value + " " + input
+        elif dhMatches.Success then
+            dhMatches.Value + " " + input
+        else
+            "DO " + input
+    else
+        input
+
+type IndirectQuestionMode = 
+    | Forced
+    | Relaxed
+
 type ClassificationMode = 
     | Monothetic 
     | AllFeatures
 
-let Classify( taggedSentence : string ) ( mode : ClassificationMode )= 
+let Classify ( classificationMode : ClassificationMode ) ( indirectQuestionMode : IndirectQuestionMode ) ( taggedSentence : string ) = 
     //apply cascade and patterns, saving matches
     let transformedSentence,cascadeMatches = taggedSentence |> ApplyCascade
-    let patternMatches = transformedSentence |> ApplyPatterns
+    let patternMatches = 
+        match indirectQuestionMode with
+        | Forced -> transformedSentence |> ForceIndirectQuestion |> ApplyPatterns
+        | Relaxed -> transformedSentence |> ApplyPatterns
 
     //Assign a score to each match based on the order of the matches (low is better)
     let matches = new ResizeArray<string*int>()
 
     cascadeMatches 
     |> Seq.filter( fun s -> s.StartsWith("#" ) )
-    |> Seq.mapi( fun i t -> (t, i) )
+    |> Seq.mapi( fun i s -> (s, i+1) ) 
     |> matches.AddRange
 
     patternMatches 
-    |> Seq.mapi( fun i t -> (t, i) )
+    |> Seq.mapi( fun i s -> (s, i+1) )
     |> matches.AddRange
 
+    //The original tcl was hard to follow here. The major ideas are
+    // 1. If no patterns match but a key matched, go with keys
+    // 2. If both match, find a matching pair and choose that
+    // 3. If no pair found, choose the highest ranked pattern match
+    // 4. If no key matches but patterns do, choose the highest ranked pattern match
+    // The following code should subsume this logic
     //combine the cascade and pattern scores by summing
     let matchWeights =
         matches
+        |> Seq.map( fun (s,i) -> (s.Replace("#", ""), i )) //removing hash will merge keywords and patterns 
         |> Seq.groupBy fst
         |> Seq.map( fun (g,s) -> 
-            let sum = s |> Seq.sumBy snd
+            //sum ranks but multiply by the number of matches
+            let sum = (s |> Seq.sumBy snd ) * (Seq.length s ) 
             (g, sum)
         )
-        |> Map.ofSeq
-    
-    match mode with
-    | Monothetic -> ()
-    | AllFeatures -> ()
+        |> Seq.sortByDescending snd
+        |> ResizeArray
+
+    //A little wonky for debugging purposes: return the classification and the scores
+    let classification = 
+        match matchWeights |> Seq.tryHead with
+        | Some(s,i) -> (s, matchWeights)
+        | None -> ("ASSERTION", new ResizeArray<string*int>() )
+
+    match classificationMode with
+    | Monothetic -> classification
+    | AllFeatures -> ("FEATURES", matches ) //Again wonk; fake a classification and return all the matches before scoring
 
   
           
