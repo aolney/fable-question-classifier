@@ -1,4 +1,4 @@
-# Fable Speech Act Classifier
+# Question Classifier 2003 Reboot
 
 ## STATUS: IN PROGRESS/NOT FUNCTIONAL
 
@@ -19,59 +19,50 @@ All that being said, please cite the [work from 2003](https://olney.ai/category/
 
 ------------------------------
 
-
 ## Requirements
 
-* [dotnet SDK](https://www.microsoft.com/net/download/core) 2.0.0 or higher
-* [node.js](https://nodejs.org) 4.8.2 or higher
-* npm5: JS package manager
-
-Although is not a Fable requirement, on macOS and Linux you'll need [Mono](http://www.mono-project.com/) for other F# tooling like Paket or editor support.
-
-## Editor
-
-The project can be used by editors compatible with the new .fsproj format, like VS Code + [Ionide](http://ionide.io/), Emacs with [fsharp-mode](https://github.com/fsharp/emacs-fsharp-mode) or [Rider](https://www.jetbrains.com/rider/). **Visual Studio for Mac** is also compatible but in the current version the package auto-restore function conflicts with Paket so you need to disable it: `Preferences > Nuget > General`.
+* [dotnet SDK](https://www.microsoft.com/net/download/core) 2.1 or higher
+* [node.js](https://nodejs.org) with [npm](https://www.npmjs.com/)
+* An F# editor like Visual Studio, Visual Studio Code with [Ionide](http://ionide.io/) or [JetBrains Rider](https://www.jetbrains.com/rider/).
 
 ## Building and running the app
 
-* Install JS dependencies: `yarn install`
-* **Move to `src` folder**: `cd src`
-* Install F# dependencies: `dotnet restore`
-* Start Fable daemon and [Webpack](https://webpack.js.org/) dev server: `dotnet fable yarn-start`
-* In your browser, open: http://localhost:8080/
+* Install JS dependencies: `npm install`
+* Install .NET dependencies: `mono .paket/paket.exe install`
+* Start Webpack dev server: `npx webpack-dev-server` or `npm start`
+* After the first compilation is finished, in your browser open: http://localhost:8080/
 
-> `dotnet fable yarn-start` (or `npm-start`) is used to start the Fable daemon and run a script in package.json concurrently. It's a shortcut of `yarn-run [SCRIP_NAME]`, e.g. `dotnet fable yarn-run start`.
+Any modification you do to the F# code will be reflected in the web page after saving.
 
-If you are using VS Code + [Ionide](http://ionide.io/), you can also use the key combination: Ctrl+Shift+B (Cmd+Shift+B on macOS) instead of typing the `dotnet fable yarn-start` command. This also has the advantage that Fable-specific errors will be highlighted in the editor along with other F# errors.
+## Building and running the tests
 
-Any modification you do to the F# code will be reflected in the web page after saving. When you want to output the JS code to disk, run `dotnet fable yarn-build` (or `npm-build`) and you'll get a minified JS bundle in the `public` folder.
+* Build: `npm pretest`
+* Run: `npm test`
 
 ## Project structure
 
-### Paket
+### npm/yarn
 
-[Paket](https://fsprojects.github.io/Paket/) is the package manager used for F# dependencies. It doesn't need a global installation, the binary is included in the `.paket` folder. Other Paket related files are:
+JS dependencies are declared in `package.json`, while `package-lock.json` is a lock file automatically generated.
 
-- **paket.dependencies**: contains all the dependencies in the repository.
-- **paket.references**: there should be one such a file next to each `.fsproj` file.
-- **paket.lock**: automatically generated, but should committed to source control, [see why](https://fsprojects.github.io/Paket/faq.html#Why-should-I-commit-the-lock-file).
-- **Nuget.Config**: prevents conflicts with Paket in machines with some Nuget configuration.
+### paket
 
-> Paket dependencies will be installed in the `packages` directory. See [Paket website](https://fsprojects.github.io/Paket/) for more info.
+[Paket](https://fsprojects.github.io/Paket/) 
 
-### npm
+> Paket is a dependency manager for .NET and mono projects, which is designed to work well with NuGet packages and also enables referencing files directly from Git repositories or any HTTP resource. It enables precise and predictable control over what packages the projects within your application reference.
 
-- **package.json**: contains the JS dependencies together with other info, like development scripts.
-- **package-lock.json**: is the lock file created by npm5.
+.NET dependencies are declared in `paket.dependencies`. The `src/paket.references` lists the libraries actually used in the project. Since you can have several F# projects, we could have different custom `.paket` files for each project.
 
-> JS dependencies will be installed in `node_modules`. See [npm](https://www.npmjs.com/) website for more info.
+Last but not least, in the `.fsproj` file you can find a new node: `	<Import Project="..\.paket\Paket.Restore.targets" />` which just tells the compiler to look for the referenced libraries information from the `.paket/Paket.Restore.targets` file.
+
+### Fable-splitter
+
+[Fable-splitter]() is a standalone tool which outputs separated files instead of a single bundle. Here all the js files are put into the `build`  dir. And the main entry point is our `App.js` file.
 
 ### Webpack
 
-[Webpack](https://webpack.js.org) is a bundler, which links different JS sources into a single file making deployment much easier. It also offers other features, like a static dev server that can automatically refresh the browser upon changes in your code or a minifier for production release. Fable interacts with Webpack through the `fable-loader`.
+[Webpack](https://webpack.js.org) is a JS bundler with extensions, like a static dev server that enables hot reloading on code changes. Fable interacts with Webpack through the `fable-loader`. Configuration for Webpack is defined in the `webpack.config.js` file. Note this sample only includes basic Webpack configuration for development mode, if you want to see a more comprehensive configuration check the [Fable webpack-config-template](https://github.com/fable-compiler/webpack-config-template/blob/master/webpack.config.js).
 
-- **webpack.config.js**: is the configuration file for Webpack. It allows you to set many things: like the path of the bundle, the port for the development server or [Babel](https://babeljs.io/) options. See [Webpack website](https://webpack.js.org) for more info.
+### Web assets
 
-### F# source files
-
-The template only contains two F# source files: the project (.fsproj) and a source file (.fs) in `src` folder.
+The `index.html` file and other assets like an icon can be found in the `public` folder.

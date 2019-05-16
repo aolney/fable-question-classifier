@@ -3,8 +3,8 @@ module Natural
 //Foreign interface file for https://github.com/NaturalNode/natural
 open Fable.Core
 open Fable.Core.JsInterop
-open Fable.PowerPack
-open Fable.PowerPack.Fetch
+// open Fable.PowerPack
+// open Fable.Fetch
 
 let inline private (~%) x = createObj x
 

@@ -1,24 +1,33 @@
-module App.View
+module App
 
 open Fable.Core
 open Fable.Core.JsInterop
-open Fable.Import
-open Fable.Import.Browser
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
-
+// open Fable.Import
+// open Fable.Import.Browser
+open Elmish
 open Elmish.React
+open Fable.React
+open Fable.React.Props
+open Browser.Dom
 open Elmish.Debug
 open Elmish.HMR
-open Elmish
-open System.IO
+
+open Thoth.Json
+// open System.IO
 
 open Fulma
 
 //open Elmish.Browser.Navigation
 //open Elmish.Browser.UrlParser
 
-importAll "../sass/main.sass"
+// importAll "../sass/main.sass"
+
+//Fable 2 transition
+let inline toJson x = Encode.Auto.toString(0, x)
+let inline ofJson<'T> json = Decode.Auto.unsafeFromString<'T>(json)
+
+// TESTS
+let randomFeature() = [1;2;3]
 
 // Static resources
 // ---------------------------------------
@@ -110,7 +119,7 @@ let update msg model =
 // View
 // ---------------------------------------
 let simpleButton txt action dispatch =
-  div
+  div 
     [ ClassName "column is-narrow" ]
     [ a
         [ ClassName "button"
@@ -150,6 +159,10 @@ let view model dispatch =
     ]
   ]  
 
+//test shim
+// let NothingCallback (f:float) = ()
+// let NothingRequest (callback: float -> unit) = 1.0
+// window.requestAnimationFrame <- NothingRequest
 
 // App
 Program.mkProgram init update view
@@ -158,5 +171,5 @@ Program.mkProgram init update view
 |> Program.withDebugger
 //|> Program.withHMR
 #endif
-|> Program.withReact "elmish-app"
+|> Program.withReactBatched "elmish-app"
 |> Program.run
