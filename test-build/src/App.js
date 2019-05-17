@@ -8,6 +8,8 @@ exports.Mode$reflection = Mode$reflection;
 exports.Model$reflection = Model$reflection;
 exports.Msg$reflection = Msg$reflection;
 exports.init = init;
+exports.TokenizeTag = TokenizeTag;
+exports.TokenizeTagClassify = TokenizeTagClassify;
 exports.update = update;
 exports.simpleButton = simpleButton;
 exports.view = view;
@@ -98,6 +100,28 @@ function init() {
   return [new Model("Whom did you ask? Did you ever have a reason to think that the sandwhich which you compared to a lemming might know how to test or assess the characteristic frequency of an unladen swallow? Shouldn't you guess? Don't you think you haven't? Won't you at least try? What was its name? Why do you think that?", "", new Mode(0, "FreeText")), new _Types.List()];
 }
 
+function TokenizeTag(text) {
+  const array$$1 = sentenceTokenizer.tokenize(text + " ");
+  return (0, _Array.map)(function mapping$$1(s) {
+    const taggedSentence = tagger.tag(wordTokenizer.tokenize(s));
+    const flatTaggedSentence = (0, _String.join)(" ", ...(0, _Array.map)(function mapping(tw) {
+      return tw.token + "/" + tw.tag;
+    }, taggedSentence.taggedWords, Array));
+    return flatTaggedSentence;
+  }, array$$1, Array);
+}
+
+function TokenizeTagClassify(text$$1) {
+  const array$$2 = TokenizeTag(text$$1);
+  return (0, _Array.map)(function mapping$$2(s$$1) {
+    var classificationMode, indirectQuestionMode;
+    const patternInput = (classificationMode = new _QuestionClassifier.ClassificationMode(0, "Monothetic"), (indirectQuestionMode = new _QuestionClassifier.IndirectQuestionMode(1, "Relaxed"), function (taggedSentence$$1) {
+      return (0, _QuestionClassifier.Classify)(classificationMode, indirectQuestionMode, taggedSentence$$1);
+    }))(s$$1);
+    return [patternInput[0], patternInput[1]];
+  }, array$$2, Array);
+}
+
 function update(msg, model) {
   switch (msg.tag) {
     case 2:
@@ -108,38 +132,12 @@ function update(msg, model) {
 
     case 0:
       {
-        const TokenizeTagClassify = function TokenizeTagClassify(text) {
-          const array$$1 = sentenceTokenizer.tokenize(text + " ");
-          return (0, _Array.map)(function mapping$$1(s) {
-            var classificationMode, indirectQuestionMode;
-            const taggedSentence = tagger.tag(wordTokenizer.tokenize(s));
-            const flatTaggedSentence = (0, _String.join)(" ", ...(0, _Array.map)(function mapping(tw) {
-              return tw.token + "/" + tw.tag;
-            }, taggedSentence.taggedWords, Array));
-            const patternInput = (classificationMode = new _QuestionClassifier.ClassificationMode(0, "Monothetic"), (indirectQuestionMode = new _QuestionClassifier.IndirectQuestionMode(1, "Relaxed"), function (taggedSentence$$1) {
-              return (0, _QuestionClassifier.Classify)(classificationMode, indirectQuestionMode, taggedSentence$$1);
-            }))(flatTaggedSentence);
-            return [patternInput[0], patternInput[1]];
-          }, array$$1, Array);
-        };
-
-        const TokenizeTag = function TokenizeTag(text$$1) {
-          const array$$3 = sentenceTokenizer.tokenize(text$$1 + " ");
-          return (0, _Array.map)(function mapping$$3(s$$1) {
-            const taggedSentence$$2 = tagger.tag(wordTokenizer.tokenize(s$$1));
-            const flatTaggedSentence$$1 = (0, _String.join)(" ", ...(0, _Array.map)(function mapping$$2(tw$$1) {
-              return tw$$1.token + "/" + tw$$1.tag;
-            }, taggedSentence$$2.taggedWords, Array));
-            return flatTaggedSentence$$1;
-          }, array$$3, Array);
-        };
-
-        const TabbedInput = function TabbedInput(text$$2) {
+        const TabbedInput = function TabbedInput(text$$3) {
           let rowCols;
-          const array$$4 = model.Input.split("\n");
-          rowCols = (0, _Array.map)(function mapping$$4(row) {
+          const array$$3 = model.Input.split("\n");
+          rowCols = (0, _Array.map)(function mapping$$3(row) {
             return row.split("\t");
-          }, array$$4, Array);
+          }, array$$3, Array);
           const inputRows = (0, _Seq.map)(_Array.last, rowCols);
           return inputRows;
         };

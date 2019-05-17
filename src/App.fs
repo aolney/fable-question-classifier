@@ -68,6 +68,25 @@ let init () : Model * Cmd<Msg> =
   //({Input="A little blue-and-black fish swims up to a mirror. It maneuvers its body vertically to reflect its belly, along with a brown mark that researchers have placed on its throat."; Output=""}, [])
   ({Mode=Mode.FreeText; Input="Whom did you ask? Did you ever have a reason to think that the sandwhich which you compared to a lemming might know how to test or assess the characteristic frequency of an unladen swallow? Shouldn't you guess? Don't you think you haven't? Won't you at least try? What was its name? Why do you think that?"; Output=""}, [])
 
+// Classifier functions
+/// Tokenize and tag but do not classify
+let TokenizeTag (text:string) = 
+  text +  " " //pad with white space b/c of bug
+  |> sentenceTokenizer.tokenize
+  |> Array.map( fun s -> 
+    let taggedSentence = s |> wordTokenizer.tokenize |> tagger.tag 
+    let flatTaggedSentence = taggedSentence.taggedWords |> Array.map( fun tw -> tw.token + "/" + tw.tag ) |> String.concat " "
+    flatTaggedSentence
+  )
+/// Classification full pipeline
+let TokenizeTagClassify (text:string) =
+  text
+  |> TokenizeTag
+  |> Array.map( fun s ->
+    let questionClassification,matches = s |> QuestionClassifier.Classify QuestionClassifier.ClassificationMode.Monothetic  QuestionClassifier.IndirectQuestionMode.Relaxed
+    (questionClassification, matches)
+  )
+
 // Update
 // ---------------------------------------
 let update msg model =
@@ -77,24 +96,6 @@ let update msg model =
   | UpdateInput(input) ->
       ({ model with Input = input}, [])
   | ProcessInput ->
-      let TokenizeTagClassify (text:string) =
-        text +  " " //pad with white space b/c of bug
-        |> sentenceTokenizer.tokenize
-        |> Array.map( fun s -> 
-          let taggedSentence = s |> wordTokenizer.tokenize |> tagger.tag 
-          let flatTaggedSentence = taggedSentence.taggedWords |> Array.map( fun tw -> tw.token + "/" + tw.tag ) |> String.concat " "
-          let questionClassification,matches = flatTaggedSentence |> QuestionClassifier.Classify QuestionClassifier.ClassificationMode.Monothetic  QuestionClassifier.IndirectQuestionMode.Relaxed
-          (questionClassification, matches)
-        )
-
-      let TokenizeTag (text:string) = 
-        text +  " " //pad with white space b/c of bug
-        |> sentenceTokenizer.tokenize
-        |> Array.map( fun s -> 
-          let taggedSentence = s |> wordTokenizer.tokenize |> tagger.tag 
-          let flatTaggedSentence = taggedSentence.taggedWords |> Array.map( fun tw -> tw.token + "/" + tw.tag ) |> String.concat " "
-          flatTaggedSentence
-        )
 
       let TabbedInput (text:string) =
         let rowCols =
@@ -171,5 +172,5 @@ Program.mkProgram init update view
 |> Program.withDebugger
 //|> Program.withHMR
 #endif
-|> Program.withReactBatched "elmish-app"
+|> Program.withReactBatched "elmish-app" //?withReactSynchronous?
 |> Program.run
