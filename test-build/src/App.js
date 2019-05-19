@@ -111,18 +111,20 @@ function TokenizeTag(text) {
   }, array$$1, Array);
 }
 
-function TokenizeTagClassify(text$$1) {
+function TokenizeTagClassify(mode, text$$1) {
   const array$$2 = TokenizeTag(text$$1);
   return (0, _Array.map)(function mapping$$2(s$$1) {
-    var classificationMode, indirectQuestionMode;
-    const patternInput = (classificationMode = new _QuestionClassifier.ClassificationMode(0, "Monothetic"), (indirectQuestionMode = new _QuestionClassifier.IndirectQuestionMode(1, "Relaxed"), function (taggedSentence$$1) {
-      return (0, _QuestionClassifier.Classify)(classificationMode, indirectQuestionMode, taggedSentence$$1);
-    }))(s$$1);
+    var indirectQuestionMode;
+    const patternInput = (indirectQuestionMode = new _QuestionClassifier.IndirectQuestionMode(1, "Relaxed"), function (taggedSentence$$1) {
+      return (0, _QuestionClassifier.Classify)(mode, indirectQuestionMode, taggedSentence$$1);
+    })(s$$1);
     return [patternInput[0], patternInput[1]];
   }, array$$2, Array);
 }
 
 function update(msg, model) {
+  var mode$$1;
+
   switch (msg.tag) {
     case 2:
       {
@@ -161,7 +163,9 @@ function update(msg, model) {
 
           });
         } else {
-          const x = TokenizeTagClassify(model.Input);
+          const x = (mode$$1 = new _QuestionClassifier.ClassificationMode(0, "Monothetic"), function (text$$4) {
+            return TokenizeTagClassify(mode$$1, text$$4);
+          })(model.Input);
           output = (0, _Encode.Auto$$$toString$$59982D9A)(0, x, null, null, {
             ResolveType() {
               return (0, _Reflection.array)((0, _Reflection.tuple)(_Reflection.string, (0, _Reflection.array)((0, _Reflection.tuple)(_Reflection.string, _Reflection.int32))));

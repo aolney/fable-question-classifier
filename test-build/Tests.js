@@ -23,7 +23,11 @@ var _String = require("./fable-library.2.3.8/String");
 
 var path$$2 = _interopRequireWildcard(require("path"));
 
+var _QuestionClassifier = require("./src/QuestionClassifier");
+
 var _App = require("./src/App");
+
+var _Seq = require("./fable-library.2.3.8/Seq");
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = Object.defineProperty && Object.getOwnPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : {}; if (desc.get || desc.set) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } } newObj.default = obj; return newObj; } }
 
@@ -50,6 +54,11 @@ function LabeledDataRow$reflection() {
 function LabeledDataRow$$$Create(a, b, c, d) {
   return new LabeledDataRow(a, b, c, d);
 }
+
+LabeledDataRow.prototype.toString = function () {
+  const x = this;
+  return x.HumanLabel + "\t" + x.Text + "\t" + x.BrillTagged + "\t" + x.OriginalishLabel;
+};
 
 describe("Tests", function () {
   it("Classifier accuracy", function () {
@@ -99,37 +108,38 @@ describe("Tests", function () {
       }
     };
 
-    const filePath = path$$2.resolve("tests", "labelled-data.tsv");
+    const labledDataFilePath = path$$2.resolve("tests", "labelled-data.tsv");
     let labeledRows;
-    const array$$3 = (0, _Array.skip)(1, readFile(filePath).split("\n"), Array);
+    const array$$3 = (0, _Array.skip)(1, readFile(labledDataFilePath).split("\n"), Array);
     labeledRows = (0, _Array.map)(function mapping(row) {
       const s = row.split("\t");
       return LabeledDataRow$$$Create(s[0], s[1], s[2], s[3]);
     }, array$$3, Array);
-    const classificationTuples = (0, _Array.map)(function mapping$$1(row$$1) {
-      return [row$$1, (0, _App.TokenizeTagClassify)(row$$1.Text)[0][0]];
-    }, labeledRows, Array);
+    let classificationTuples;
+    const array$$5 = labeledRows.filter(function predicate(row$$1) {
+      return !(row$$1.Text == null);
+    });
+    classificationTuples = (0, _Array.map)(function mapping$$1(row$$2) {
+      var mode;
+      const cleanText = (0, _String.replace)(row$$2.Text, "\"", "").trim();
+      return [row$$2, (mode = new _QuestionClassifier.ClassificationMode(2, "Debug"), function (text) {
+        return (0, _App.TokenizeTagClassify)(mode, text);
+      })(cleanText)[0]];
+    }, array$$5, Array);
+    const resultsFilePath = path$$2.resolve("tests", "classification-results.tsv");
+    writeFile(resultsFilePath, (0, _String.join)("\n", ...(0, _Array.map)(function mapping$$3(tupledArg$$1) {
+      const alternativeString = (0, _String.join)("\t", ...(0, _Seq.map)(function mapping$$2(tupledArg$$2) {
+        return tupledArg$$2[0] + "(" + (0, _Util.int32ToString)(tupledArg$$2[1]) + ")";
+      }, tupledArg$$1[1][1]));
+      return String(tupledArg$$1[0]) + "\t" + tupledArg$$1[1][0] + "\t" + alternativeString;
+    }, classificationTuples, Array)));
     (0, _String.toConsole)((0, _String.printf)("CURRENT VS HUMAN"));
-    PrintResults((0, _Array.map)(function mapping$$2(tupledArg$$1) {
-      return [tupledArg$$1[0].HumanLabel, tupledArg$$1[1]];
+    PrintResults((0, _Array.map)(function mapping$$4(tupledArg$$3) {
+      return [tupledArg$$3[0].HumanLabel, tupledArg$$3[1][0]];
     }, classificationTuples, Array));
     (0, _String.toConsole)((0, _String.printf)("ORIGINALISH VS HUMAN"));
-    PrintResults((0, _Array.map)(function mapping$$3(tupledArg$$2) {
-      return [tupledArg$$2[0].HumanLabel, tupledArg$$2[0].OriginalishLabel];
+    PrintResults((0, _Array.map)(function mapping$$5(tupledArg$$4) {
+      return [tupledArg$$4[0].HumanLabel, tupledArg$$4[0].OriginalishLabel];
     }, classificationTuples, Array));
-    (0, _String.toConsole)((0, _String.printf)("MISSING CLASSIFICATIONS"));
-    const array$$8 = classificationTuples.filter(function predicate(tupledArg$$3) {
-      if (tupledArg$$3[0].HumanLabel.trim() === "") {
-        return true;
-      } else {
-        return tupledArg$$3[1].trim() === "";
-      }
-    });
-    array$$8.forEach(function action(tupledArg$$4) {
-      var clo1$$2;
-      (clo1$$2 = (0, _String.toConsole)((0, _String.printf)("%s")), function (arg10$$3) {
-        clo1$$2(arg10$$3);
-      })(tupledArg$$4[0].Text);
-    });
   });
 });

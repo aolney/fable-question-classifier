@@ -31,6 +31,8 @@ type LabeledDataRow =
   }
   static member Create a b c d =
         { HumanLabel=a; Text=b; BrillTagged=c; OriginalishLabel=d}
+  override x.ToString() = x.HumanLabel + "\t" + x.Text + "\t" + x.BrillTagged + "\t" + x.OriginalishLabel
+
 
 describe "Tests" <| fun _ ->
     it "Classifier accuracy" <| fun () ->
@@ -47,9 +49,9 @@ describe "Tests" <| fun _ ->
           printfn "%s accuracy is %f" classification ( ( cTuples |> NumberCorrect) /( cTuples.Length |> float) )
 
       //Get labeled data
-      let filePath = path.resolve([|"tests";"labelled-data.tsv"|])
+      let labledDataFilePath = path.resolve([|"tests";"labelled-data.tsv"|])
       let labeledRows = 
-        (readFile filePath).Split('\n')
+        (readFile labledDataFilePath).Split('\n')
         |> Array.skip 1 //skip header
         |> Array.map( fun row ->
           let s = row.Split('\t')
@@ -59,12 +61,25 @@ describe "Tests" <| fun _ ->
       //Run the classifier on labeled data
       let classificationTuples = 
         labeledRows
+        |> Array.filter( fun row -> (not (isNull row.Text)) ) //something in the data is null somehow, possibly final blank row?
+
         |> Array.map( fun row ->
-          row,(row.Text |> App.TokenizeTagClassify).[0] |> fst ) //we know that there is only one question per line
+          let cleanText = row.Text.Replace("\"","").Trim() //double quotes in the test text are blowing up spreadsheets used to view results
+          row,( cleanText |> App.TokenizeTagClassify QuestionClassifier.ClassificationMode.Debug).[0] ) //we know that there is only one question per line
+
+      //Write classification results for debugging purposes
+      let resultsFilePath = path.resolve([|"tests";"classification-results.tsv"|])
+      classificationTuples 
+      |> Array.map( fun (row,(hypothesis,alternatives)) ->  
+        let alternativeString = alternatives |> Seq.map( fun (classification,weight) -> classification + "(" + weight.ToString() + ")") |> String.concat "\t"
+        row.ToString() + "\t" + hypothesis + "\t" + alternativeString
+      ) 
+      |> String.concat "\n"
+      |> writeFile resultsFilePath
 
       //Print current classification results vs human
       printfn "CURRENT VS HUMAN"
-      classificationTuples |> Array.map( fun (row,hypothesis) -> row.HumanLabel,hypothesis ) |> PrintResults 
+      classificationTuples |> Array.map( fun (row,(hypothesis,_)) -> row.HumanLabel,hypothesis ) |> PrintResults 
 
       //Print originalish classification results vs human
       printfn "ORIGINALISH VS HUMAN"

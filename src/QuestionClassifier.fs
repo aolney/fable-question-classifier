@@ -52,11 +52,11 @@ let features =
          Pattern = @"\b[Ww]ould/[A-Z]+"
          Replace = true
      }
-    //  {
-    //      Name = "A"
-    //      Pattern = @"\b[Aa]n?/[A-Z]+"
-    //      Replace = true
-    //  }
+     {
+         Name = "A"
+         Pattern = @"\b[Aa]n?/[A-Z]+"
+         Replace = true
+     }
      {
          Name = "NEG"
          Pattern = @"\b([Nn]ever|[Nn]ot|[Nn]or|[Nn]either|n't|'t|t)/[A-Z]+"
@@ -194,8 +194,18 @@ let features =
          Replace = true
      }
      {
+         Name = "SUBJPRO"
+         Pattern = @"\b([Ii]|[Hh]e|[Ww]e|[Ss]he|[Tt]hey)/[A-Z]+"
+         Replace = true
+     }
+     {
          Name = "OBJPRO"
          Pattern = @"\b([Mm]e|[Uu]s|[Hh]im|[Tt]hem)/[A-Z]+"
+         Replace = true
+     }
+     {
+         Name = "PRO"
+         Pattern = @"\b([Yy]ou|[Hh]er|[Ii]t)/[A-Z\$]+"
          Replace = true
      }
      {
@@ -209,6 +219,11 @@ let features =
          Replace = true
      }
      {
+         Name = "WHP"
+         Pattern = @"\b([Ww]ho|[Ww]hom|[Ww]hose|[Ww]hich)/[A-Z\$]+" 
+         Replace = true
+     }
+     {
          Name = "ART"
          Pattern = @"\b([Aa]|[Aa]n|[Tt]he)/[A-Z]+"
          Replace = true
@@ -218,11 +233,11 @@ let features =
          Pattern = @"\b([Ee]ach|[Aa]ll|[Ee]very|[Aa]ny|[Mm]any|[Mm]uch|[Ff]ew|[Ss]everal|[Ss]ome)/[A-Z]+"
          Replace = true
      }
-     {
-         Name = "ALL-P"
-         Pattern = @"(\.|\!|\?|\:|\;|\-|\,)/(\.|\:|\,)"
-         Replace = true
-     }
+    //  {
+    //      Name = "ALL-P"
+    //      Pattern = @"(\.|\!|\?|\:|\;|\-|\,)/(\.|\:|\,)"
+    //      Replace = true
+    //  }
      {
          Name = "ADV"
          Pattern = @"\b[A-Za-z]+/RB[RS]?"
@@ -304,72 +319,72 @@ let features =
      }
      {
          Name = "DEFINITION"
-         Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)([^#]*#?[^#]*(#SPECIAL|#DEFINITION)|[ ]?(DET )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP))|^ (MODAL|WOULD) YOU[^#]*#?[^#]*(#SPECIAL|#DEFINITION)|WHAT (DET )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP) BE"
+         Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)([^#]*#?[^#]*#DEFINITION|\b(A )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP))|^(MODAL|WOULD) YOU[^#]*#?[^#]*#DEFINITION|WHAT (A )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP) BE"
          Replace = false
      }
      {
          Name = "DISJUNCTION"
-         Pattern = @"\b(MODAL|WHICH|WOULD|SHOULD|DO|HAVE|BE)[^#]*#?[^#]*(#SPECIAL|#DISJUNCTION)"
+         Pattern = @"\b(MODAL|WHICH|WOULD|SHOULD|DO|HAVE|BE)[^#]*#?[^#]*#DISJUNCTION"
          Replace = false
      }
      {
          Name = "EXAMPLE"
-         Pattern = @"\b(WHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?| (MODAL|WOULD|SHOULD|DO|HAVE|BE))[^#]*#?[^#]*(#SPECIAL|#EXAMPLE)"
+         Pattern = @"\b(WHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?| (MODAL|WOULD|SHOULD|DO|HAVE|BE))[^#]*#?[^#]*#EXAMPLE"
          Replace = false
      }
      {
          Name = "QUANTIFICATION"
-         Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?[^#]*#?[^#]*(#SPECIAL|#QUANTIFICATION)|(^[ ]?|[ ]?ALL-P|PREP)[ ]?HOW (QUAN|ADJ|ADV)|^ (WOULD|MODAL) YOU[^#]*#?[^#]*(#SPECIAL|#QUANTIFICATION)"
+         Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?[^#]*#?[^#]*#QUANTIFICATION|(^[ ]?|[ ]?ALL-P|PREP)[ ]?HOW (QUAN|ADJ|ADV)|^ (WOULD|MODAL) YOU[^#]*#?[^#]*#QUANTIFICATION"
          Replace = false
      }
      {
          Name = "FEATURESPEC"
-         Pattern = @"\bWHAT[^#]*#?[^#]*(#SPECIAL|#FEATURESPEC)|(#SPECIAL|#FEATURESPEC)"
+         Pattern = @"\bWHAT[^#]*#?[^#]*#FEATURESPEC|#FEATURESPEC"
          Replace = false
      }
      {
          Name = "ENABLEMENT"
-         Pattern = @"\b(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*(#SPECIAL|#ENABLEMENT)"
+         Pattern = @"\b(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*#ENABLEMENT"
          Replace = false
      }
      {
          Name = "JUDGMENTAL"
-         Pattern = @"\b(YOU|YOUR) (#SPECIAL|#JUDGMENTAL)|(SHOULD|#SPECIAL|#JUDGMENTAL) (SUBJPRO|PRO|NN[SP]?[S]?)|^[ ]?(WHAT|HOW|WHY) SHOULD"
+         Pattern = @"\b(YOU|YOUR) #JUDGMENTAL|(SHOULD|#JUDGMENTAL) (SUBJPRO|PRO|NN[SP]?[S]?)|^[ ]?(WHAT|HOW|WHY) SHOULD"
          Replace = false
      }
      {
          Name = "EXPECTATIONAL"
-         Pattern = @"\bWHY (HAVE|BE|DO)?[^#]*#?[^#]*NEG|MODAL (#SPECIAL|#CAUSALCONS) (#SPECIAL|#CAUSALANTE)"
+         Pattern = @"\bWHY (HAVE|BE|DO)?[^#]*#?[^#]*NEG|MODAL #CAUSALCONS #CAUSALANTE"
          Replace = false
      }
      {
          Name = "CAUSALCONS"
-         Pattern = @"\b(WHAT| DO)[^#]*#?[^#]*(#SPECIAL|#CAUSALCONS)"
+         Pattern = @"\b(WHAT| DO)[^#]*#?[^#]*#CAUSALCONS"
          Replace = false
      }
      {
          Name = "COMPARISON"
-         Pattern = @"(^[ ]?WHAT|^[ ]?(WHP|WHICH)) (BE|MODAL|WOULD|SHOULD)?[^#]*#?[^#]*(#SPECIAL|#COMPARISON)|HOW[^#]*#?[^#]*(#SPECIAL|#COMPARISON)|^ (MODAL|WOULD) YOU[^#]*#?[^#]*(#SPECIAL|#COMPARISON)"
+         Pattern = @"(^[ ]?WHAT|^[ ]?(WHP|WHICH)) (BE|MODAL|WOULD|SHOULD)?[^#]*#?[^#]*#COMPARISON|HOW[^#]*#?[^#]*#COMPARISON|^ (MODAL|WOULD) YOU[^#]*#?[^#]*#COMPARISON"
          Replace = false
      }
      {
          Name = "INSTRUMENTAL"
-         Pattern = @"^[ ]?HOW (MODAL|WOULD|SHOULD|DO) ((ART )?NN[SP]?[S]?|YOU|SUBJPRO|PRO)|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*(#SPECIAL|#INSTRUMENTAL)|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY) NN[SP]?[S]?[^#]*#?[^#]*(#SPECIAL|#INSTRUMENTAL)|^ (MODAL|WOULD) YOU[^#]*#?[^#]*(#SPECIAL|#INSTRUMENTAL)"
+         Pattern = @"^[ ]?HOW (MODAL|WOULD|SHOULD|DO) ((ART )?NN[SP]?[S]?|YOU|SUBJPRO|PRO)|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*#INSTRUMENTAL|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY) NN[SP]?[S]?[^#]*#?[^#]*#INSTRUMENTAL|^ (MODAL|WOULD) YOU[^#]*#?[^#]*#INSTRUMENTAL"
          Replace = false
      }
      {
          Name = "GOALORIENTATION"
-         Pattern = @"^[ ]?WHY (DO|BE) (YOU|SUBJPRO|PRO|ART (#SPECIAL|#GOALORIENTATION)|(ART )?NN[SP]?[S]?)|(^[ ]?WHAT|^[ ]?(WHP|WHICH))([^#]*#?[^#]*(#SPECIAL|#GOALORIENTATION)|MODAL|WOULD|SHOULD PRO)|^[ ]?(WHAT|WHY) WOULD (ART |A )?(YOU|SUBJPRO|PRO|NN[SP]?[S]?)"
+         Pattern = @"^[ ]?WHY (DO|BE) (YOU|SUBJPRO|PRO|ART #GOALORIENTATION|(ART )?NN[SP]?[S]?)|(^[ ]?WHAT|^[ ]?(WHP|WHICH))([^#]*#?[^#]*#GOALORIENTATION|MODAL|WOULD|SHOULD PRO)|^[ ]?(WHAT|WHY) WOULD (ART |A )?(YOU|SUBJPRO|PRO|NN[SP]?[S]?)"
          Replace = false
      }
      {
          Name = "CAUSALANTE"
-         Pattern = @"^[ ]?(WHY|HOW) (DO|BE|MODAL|WOULD|SHOULD)[^#]*#?[^#]*(VBD?N?G?|(#SPECIAL|#CAUSALANTE))|^ (DO|MODAL|WOULD|SHOULD)[^#]*#?[^#]*(#SPECIAL|#CAUSALANTE)|(^|ALL-P)[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[ ]? (#SPECIAL|#CAUSALANTE)"
+         Pattern = @"^[ ]?(WHY|HOW) (DO|BE|MODAL|WOULD|SHOULD)[^#]*#?[^#]*(VBD?N?G?|#CAUSALANTE)|^ (DO|MODAL|WOULD|SHOULD)[^#]*#?[^#]*#CAUSALANTE|(^|ALL-P)[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[ ]? #CAUSALANTE"
          Replace = false
      }
      {
          Name = "INTERPRETATION"
-         Pattern = @"(#SPECIAL|#INTERPRETATION)"
+         Pattern = @"INTERPRETATION"
          Replace = false
      }
 
@@ -432,6 +447,7 @@ type IndirectQuestionMode =
 type ClassificationMode = 
     | Monothetic 
     | AllFeatures
+    | Debug
 
 let Classify ( classificationMode : ClassificationMode ) ( indirectQuestionMode : IndirectQuestionMode ) ( taggedSentence : string ) = 
     //apply cascade and patterns, saving matches
@@ -481,6 +497,11 @@ let Classify ( classificationMode : ClassificationMode ) ( indirectQuestionMode 
     match classificationMode with
     | Monothetic -> classification
     | AllFeatures -> ("FEATURES", matches ) //Again wonk; fake a classification and return all the matches before scoring
+    | Debug -> 
+        let c = classification |> fst
+        let newWeights = classification |> snd
+        newWeights.Insert(0,(transformedSentence,-1) )
+        (c,newWeights)
 
   
           

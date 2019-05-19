@@ -79,11 +79,11 @@ let TokenizeTag (text:string) =
     flatTaggedSentence
   )
 /// Classification full pipeline
-let TokenizeTagClassify (text:string) =
+let TokenizeTagClassify ( mode: QuestionClassifier.ClassificationMode )(text:string) =
   text
   |> TokenizeTag
   |> Array.map( fun s ->
-    let questionClassification,matches = s |> QuestionClassifier.Classify QuestionClassifier.ClassificationMode.Monothetic  QuestionClassifier.IndirectQuestionMode.Relaxed
+    let questionClassification,matches = s |> QuestionClassifier.Classify mode QuestionClassifier.IndirectQuestionMode.Relaxed
     (questionClassification, matches)
   )
 
@@ -111,7 +111,7 @@ let update msg model =
 
       let output = 
         match model.Mode with
-        | FreeText -> model.Input |> TokenizeTagClassify |> toJson
+        | FreeText -> model.Input |> TokenizeTagClassify QuestionClassifier.ClassificationMode.Monothetic |> toJson
         | TagOnly -> model.Input |> TokenizeTag |> toJson
         | TabDelimited -> model.Input |> TabbedInput |> toJson
         
