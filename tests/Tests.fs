@@ -65,7 +65,7 @@ describe "Tests" <| fun _ ->
 
         |> Array.map( fun row ->
           let cleanText = row.Text.Replace("\"","").Trim() //double quotes in the test text are blowing up spreadsheets used to view results
-          row,( cleanText |> App.TokenizeTagClassify QuestionClassifier.ClassificationMode.Debug).[0] ) //we know that there is only one question per line
+          row,( cleanText |> App.TokenizeTagClassify QuestionClassifier.ClassificationMode.Debug QuestionClassifier.IndirectQuestionMode.IsOn).[0] ) //we know that there is only one question per line
 
       //Write classification results for debugging purposes
       let resultsFilePath = path.resolve([|"tests";"classification-results.tsv"|])
@@ -78,12 +78,18 @@ describe "Tests" <| fun _ ->
       |> writeFile resultsFilePath
 
       //Print current classification results vs human
+      printfn ""
       printfn "CURRENT VS HUMAN"
       classificationTuples |> Array.map( fun (row,(hypothesis,_)) -> row.HumanLabel,hypothesis ) |> PrintResults 
 
       //Print originalish classification results vs human
+      printfn ""
       printfn "ORIGINALISH VS HUMAN"
       classificationTuples |> Array.map( fun (row,_) -> row.HumanLabel,row.OriginalishLabel ) |> PrintResults 
+
+      printfn ""
+      printfn "================================================================"
+      printfn "NOTE: Suggest ignoring major differences in the Verification category, because the original labeled data is very questionable for that category."
 
       // printfn "MISSING CLASSIFICATIONS"
       // classificationTuples 

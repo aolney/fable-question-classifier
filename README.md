@@ -3,6 +3,8 @@
 ## STATUS: IN PROGRESS/NOT FUNCTIONAL
 
 This code is a reimplementation of [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) written in `tcl`.
+The goal here is not to improve upon that work but to get as reasonably close to it as possible. 
+Any improvements will appear in other repositories.
 
 Ideas from this work have been [used recently but within a machine learning framework](https://olney.ai/category/2018/11/05/kellyer.html).
 
@@ -14,8 +16,9 @@ The primary reasons are:
 - The code has been translated from `tcl` native regex to `f#`
 - The original code used the [Brill Tagger](https://en.wikipedia.org/wiki/Brill_tagger) as a preprocessing step, and I have replaced that with [a javascript implementation](https://github.com/NaturalNode/natural) that may perform differently, affecting my program's results.
 
-All that being said, please cite the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) when using this code but also please state that it is a reimplementation. 
+Some tests have been added that compare performance of the `tcl` code I found to this reimplementation, for comparison.
 
+All that being said, please cite the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) when using this code but also please state that it is a reimplementation. 
 
 ------------------------------
 

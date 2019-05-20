@@ -120,11 +120,11 @@ describe("Tests", function () {
       return !(row$$1.Text == null);
     });
     classificationTuples = (0, _Array.map)(function mapping$$1(row$$2) {
-      var mode;
+      var classificationMode, indirectQuestionMode;
       const cleanText = (0, _String.replace)(row$$2.Text, "\"", "").trim();
-      return [row$$2, (mode = new _QuestionClassifier.ClassificationMode(2, "Debug"), function (text) {
-        return (0, _App.TokenizeTagClassify)(mode, text);
-      })(cleanText)[0]];
+      return [row$$2, (classificationMode = new _QuestionClassifier.ClassificationMode(2, "Debug"), (indirectQuestionMode = new _QuestionClassifier.IndirectQuestionMode(0, "IsOn"), function (text) {
+        return (0, _App.TokenizeTagClassify)(classificationMode, indirectQuestionMode, text);
+      }))(cleanText)[0]];
     }, array$$5, Array);
     const resultsFilePath = path$$2.resolve("tests", "classification-results.tsv");
     writeFile(resultsFilePath, (0, _String.join)("\n", ...(0, _Array.map)(function mapping$$3(tupledArg$$1) {
@@ -133,13 +133,18 @@ describe("Tests", function () {
       }, tupledArg$$1[1][1]));
       return String(tupledArg$$1[0]) + "\t" + tupledArg$$1[1][0] + "\t" + alternativeString;
     }, classificationTuples, Array)));
+    (0, _String.toConsole)((0, _String.printf)(""));
     (0, _String.toConsole)((0, _String.printf)("CURRENT VS HUMAN"));
     PrintResults((0, _Array.map)(function mapping$$4(tupledArg$$3) {
       return [tupledArg$$3[0].HumanLabel, tupledArg$$3[1][0]];
     }, classificationTuples, Array));
+    (0, _String.toConsole)((0, _String.printf)(""));
     (0, _String.toConsole)((0, _String.printf)("ORIGINALISH VS HUMAN"));
     PrintResults((0, _Array.map)(function mapping$$5(tupledArg$$4) {
       return [tupledArg$$4[0].HumanLabel, tupledArg$$4[0].OriginalishLabel];
     }, classificationTuples, Array));
+    (0, _String.toConsole)((0, _String.printf)(""));
+    (0, _String.toConsole)((0, _String.printf)("================================================================"));
+    (0, _String.toConsole)((0, _String.printf)("NOTE: Suggest ignoring major differences in the Verification category, because the original labeled data is very questionable for that category."));
   });
 });

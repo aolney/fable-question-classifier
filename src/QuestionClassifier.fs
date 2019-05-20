@@ -74,7 +74,7 @@ let features =
      }
      {
          Name = "SHOULD"
-         Pattern = @"\b[Yy]our/[A-Z]+"
+         Pattern = @"\b[Ss]hould/[A-Z]+"
          Replace = true
      }
      {
@@ -309,42 +309,42 @@ let features =
      //begin non-replacing patterns
      {
          Name = "VERIFICATION"
-         Pattern = @"\b(MODAL|WOULD|SHOULD|DO|HAVE|BE)"
+         Pattern = @"^[ ]?(MODAL|WOULD|SHOULD|DO|HAVE|BE)"
          Replace = false
      }
      {
          Name = "CONCEPTCOMPLETION"
-         Pattern = @"(^|ALL-P)[ ]?(WHAT|WHO_|WHERE|WHEN|WHICH)"
+         Pattern = @"^[ ]?(WHAT|WHO_|WHERE|WHEN|WHICH)"
          Replace = false
      }
      {
          Name = "DEFINITION"
-         Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)([^#]*#?[^#]*#DEFINITION|\b(A )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP))|^(MODAL|WOULD) YOU[^#]*#?[^#]*#DEFINITION|WHAT (A )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP) BE"
+         Pattern = @"^[ ]?WHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)([^#]*#?[^#]*#DEFINITION|[ ]?(A )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP))|^(MODAL|WOULD) YOU[^#]*#?[^#]*#DEFINITION|WHAT (A )?(ADJ |ADV )*(NN[SP]?[S]?|[^/]+/NNP) BE"
          Replace = false
      }
      {
          Name = "DISJUNCTION"
-         Pattern = @"\b(MODAL|WHICH|WOULD|SHOULD|DO|HAVE|BE)[^#]*#?[^#]*#DISJUNCTION"
+         Pattern = @"^[ ]?(MODAL|WHICH|WOULD|SHOULD|DO|HAVE|BE)[^#]*#?[^#]*#DISJUNCTION"
          Replace = false
      }
      {
          Name = "EXAMPLE"
-         Pattern = @"\b(WHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?| (MODAL|WOULD|SHOULD|DO|HAVE|BE))[^#]*#?[^#]*#EXAMPLE"
+         Pattern = @"^[ ]?(WHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?| (MODAL|WOULD|SHOULD|DO|HAVE|BE))[^#]*#?[^#]*#EXAMPLE"
          Replace = false
      }
      {
          Name = "QUANTIFICATION"
-         Pattern = @"\bWHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?[^#]*#?[^#]*#QUANTIFICATION|(^[ ]?|[ ]?ALL-P|PREP)[ ]?HOW (QUAN|ADJ|ADV)|^ (WOULD|MODAL) YOU[^#]*#?[^#]*#QUANTIFICATION"
+         Pattern = @"^[ ]?WHAT (MODAL|WOULD|SHOULD|DO|HAVE|BE)?[^#]*#?[^#]*#QUANTIFICATION|(^[ ]?|[ ]?ALL-P|PREP)[ ]?HOW (QUAN|ADJ|ADV)|^ (WOULD|MODAL) YOU[^#]*#?[^#]*#QUANTIFICATION"
          Replace = false
      }
      {
          Name = "FEATURESPEC"
-         Pattern = @"\bWHAT[^#]*#?[^#]*#FEATURESPEC|#FEATURESPEC"
+         Pattern = @"^[ ]?WHAT[^#]*#?[^#]*#FEATURESPEC|#FEATURESPEC"
          Replace = false
      }
      {
          Name = "ENABLEMENT"
-         Pattern = @"\b(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*#ENABLEMENT"
+         Pattern = @"^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*#ENABLEMENT"
          Replace = false
      }
      {
@@ -353,13 +353,8 @@ let features =
          Replace = false
      }
      {
-         Name = "EXPECTATIONAL"
-         Pattern = @"\bWHY (HAVE|BE|DO)?[^#]*#?[^#]*NEG|MODAL #CAUSALCONS #CAUSALANTE"
-         Replace = false
-     }
-     {
          Name = "CAUSALCONS"
-         Pattern = @"\b(WHAT| DO)[^#]*#?[^#]*#CAUSALCONS"
+         Pattern = @"^[ ]?(WHAT| DO)[^#]*#?[^#]*#CAUSALCONS"
          Replace = false
      }
      {
@@ -368,8 +363,8 @@ let features =
          Replace = false
      }
      {
-         Name = "INSTRUMENTAL"
-         Pattern = @"^[ ]?HOW (MODAL|WOULD|SHOULD|DO) ((ART )?NN[SP]?[S]?|YOU|SUBJPRO|PRO)|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*#INSTRUMENTAL|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY) NN[SP]?[S]?[^#]*#?[^#]*#INSTRUMENTAL|^ (MODAL|WOULD) YOU[^#]*#?[^#]*#INSTRUMENTAL"
+         Name = "CAUSALANTE"
+         Pattern = @"^[ ]?(WHY|HOW) (DO|BE|MODAL|WOULD|SHOULD)[^#]*#?[^#]*(VBD?N?G?|#CAUSALANTE)|^ (DO|MODAL|WOULD|SHOULD)[^#]*#?[^#]*#CAUSALANTE|(^|ALL-P)[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[ ]? #CAUSALANTE"
          Replace = false
      }
      {
@@ -378,8 +373,13 @@ let features =
          Replace = false
      }
      {
-         Name = "CAUSALANTE"
-         Pattern = @"^[ ]?(WHY|HOW) (DO|BE|MODAL|WOULD|SHOULD)[^#]*#?[^#]*(VBD?N?G?|#CAUSALANTE)|^ (DO|MODAL|WOULD|SHOULD)[^#]*#?[^#]*#CAUSALANTE|(^|ALL-P)[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[ ]? #CAUSALANTE"
+         Name = "INSTRUMENTAL"
+         Pattern = @"^[ ]?HOW (MODAL|WOULD|SHOULD|DO) ((ART )?NN[SP]?[S]?|YOU|SUBJPRO|PRO)|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY)[^#]*#?[^#]*#INSTRUMENTAL|^[ ]?(WHO|WHAT|HOW|WHO_|WHERE|WHEN|WHY) NN[SP]?[S]?[^#]*#?[^#]*#INSTRUMENTAL|^ (MODAL|WOULD) YOU[^#]*#?[^#]*#INSTRUMENTAL"
+         Replace = false
+     }
+     {
+         Name = "EXPECTATIONAL"
+         Pattern = @"^[ ]?WHY (HAVE|BE|DO)?[^#]*#?[^#]*NEG|MODAL #CAUSALCONS #CAUSALANTE"
          Replace = false
      }
      {
@@ -422,7 +422,7 @@ let ApplyPatterns( taggedSentence : string ) =
     //
     matches
 
-let questionRegex = System.Text.RegularExpressions.Regex("^(PREP )?(WHO|WHO_|WHAT|HOW|WHY|WHERE|WHEN|WHP|MODAL|DO|HAVE|BE|SHOULD|#KEYS_SPECIAL|#KEYS_JUDGEMENTAL|WOULD|WHICH).*")
+let questionRegex = System.Text.RegularExpressions.Regex("^(PREP )?(WHO|WHO_|WHAT|HOW|WHY|WHERE|WHEN|WHP|MODAL|DO|HAVE|BE|SHOULD|#KEYS_JUDGEMENTAL|WOULD|WHICH).*")
 let whRegex = System.Text.RegularExpressions.Regex("(WHO|WHO_|WHAT|HOW|WHY|WHERE|WHEN|WHP)")
 let doHaveRegex = System.Text.RegularExpressions.Regex("(MODAL|DO|HAVE|BE)")
 
@@ -441,8 +441,8 @@ let ForceIndirectQuestion( input ) =
         input
 
 type IndirectQuestionMode = 
-    | Forced
-    | Relaxed
+    | IsOn
+    | IsOff
 
 type ClassificationMode = 
     | Monothetic 
@@ -454,8 +454,8 @@ let Classify ( classificationMode : ClassificationMode ) ( indirectQuestionMode 
     let transformedSentence,cascadeMatches = taggedSentence |> ApplyCascade
     let patternMatches = 
         match indirectQuestionMode with
-        | Forced -> transformedSentence |> ForceIndirectQuestion |> ApplyPatterns
-        | Relaxed -> transformedSentence |> ApplyPatterns
+        | IsOn -> transformedSentence |> ForceIndirectQuestion |> ApplyPatterns
+        | IsOff -> transformedSentence |> ApplyPatterns
 
     //Assign a score to each match based on the order of the matches (low is better)
     let matches = new ResizeArray<string*int>()
@@ -498,9 +498,13 @@ let Classify ( classificationMode : ClassificationMode ) ( indirectQuestionMode 
     | Monothetic -> classification
     | AllFeatures -> ("FEATURES", matches ) //Again wonk; fake a classification and return all the matches before scoring
     | Debug -> 
+        //unpack the classification and weights so we can add more features
         let c = classification |> fst
         let newWeights = classification |> snd
+        //insert the transformed sentence (cascade) to check that's working correctly
         newWeights.Insert(0,(transformedSentence,-1) )
+        //insert the indirect question transformation result to check that
+        newWeights.Insert(0,(transformedSentence |> ForceIndirectQuestion,-1) ) 
         (c,newWeights)
 
   
