@@ -200,3 +200,6 @@ project.lock.json
 OLD/
 NEW-V1/
 classification-results.tsv
+deploy/
+test-build/
+node-build/

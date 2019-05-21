@@ -70,7 +70,7 @@ describe "Tests" <| fun _ ->
       //Write classification results for debugging purposes
       let resultsFilePath = path.resolve([|"tests";"classification-results.tsv"|])
       classificationTuples 
-      |> Array.map( fun (row,(hypothesis,alternatives)) ->  
+      |> Array.map( fun (row,(_,hypothesis,alternatives)) ->  
         let alternativeString = alternatives |> Seq.map( fun (classification,weight) -> classification + "(" + weight.ToString() + ")") |> String.concat "\t"
         row.ToString() + "\t" + hypothesis + "\t" + alternativeString
       ) 
@@ -80,7 +80,7 @@ describe "Tests" <| fun _ ->
       //Print current classification results vs human
       printfn ""
       printfn "CURRENT VS HUMAN"
-      classificationTuples |> Array.map( fun (row,(hypothesis,_)) -> row.HumanLabel,hypothesis ) |> PrintResults 
+      classificationTuples |> Array.map( fun (row,(_,hypothesis,_)) -> row.HumanLabel,hypothesis ) |> PrintResults 
 
       //Print originalish classification results vs human
       printfn ""

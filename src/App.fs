@@ -46,10 +46,11 @@ let tagger = Natural.exports.BrillPOSTagger.Create( lexicon, rules )
 
 // Domain
 // ---------------------------------------
+[<StringEnum>]
 type Mode =
-    | FreeText 
-    | TagOnly 
-    | TabDelimited
+    | [<CompiledName("FreeText")>] FreeText 
+    | [<CompiledName("TagOnly")>] TagOnly 
+    | [<CompiledName("TabDelimited")>] TabDelimited
 
 type Result =
   {
@@ -66,7 +67,7 @@ type Model =
 
 type Msg =
     | ProcessInput
-    | ModeChange of string //Mode
+    | ModeChange of Mode
     | UpdateInput of string
 
 let init () : Model * Cmd<Msg> =
@@ -95,33 +96,22 @@ let TokenizeTagClassify ( classificationMode: QuestionClassifier.ClassificationM
     (sentence, questionClassification, matches)
   )
 
+let LastTabbedColumn (text:string) =
+  text.Split('\n')
+  |> Array.map( fun row ->
+    row.Split('\t') 
+    |> Array.last
+  )
+  
 // Update
-// ---------------------------------------
+// ---------------------------modeString------------
 let update msg model =
   match msg with
-  | ModeChange( modeString ) -> 
-    //seems like we shouldn't have to do this, but fable is not sending us modes as the value from the picker (TODO: file bug report)
-    let newMode = 
-      match modeString with
-      | "TagOnly" -> Mode.TagOnly
-      | "TabDelimited" -> Mode.TabDelimited
-      | _ -> Mode.FreeText
+  | ModeChange( newMode ) -> 
     ({ model with Mode = newMode}, [])
   | UpdateInput(input) ->
       ({ model with InputText = input}, [])
   | ProcessInput ->
-
-      let TabbedInput (text:string) =
-        let rowCols =
-            model.InputText.Split('\n')
-            |> Array.map( fun row ->
-              row.Split('\t')
-            )
-        let inputRows = 
-          rowCols
-          |> Seq.map( fun a -> a |> Array.last)
-        //
-        inputRows 
 
       let output = 
         match model.Mode with
@@ -129,15 +119,23 @@ let update msg model =
           model.InputText 
           |> TokenizeTagClassify QuestionClassifier.ClassificationMode.Monothetic QuestionClassifier.IndirectQuestionMode.IsOff 
           |> Array.map( fun (sentence,classification,matches)-> { Input=sentence; Output= classification})
-          //|> toJson
         | TagOnly -> 
           model.InputText 
           |> TokenizeTag 
           |> Array.map( fun (sentence,flatTaggedSentence)-> { Input=sentence; Output= flatTaggedSentence})
-          //|> toJson
-        //TODO
-        | TabDelimited -> [|{Input="";Output=""}|] //model.InputText |> TabbedInput |> toJson
-        
+        | TabDelimited -> 
+          model.InputText
+          |> LastTabbedColumn
+          |> Array.map(fun input ->
+            let sentenceClassificationTuples = 
+              input
+              |> TokenizeTagClassify QuestionClassifier.ClassificationMode.Monothetic QuestionClassifier.IndirectQuestionMode.IsOff 
+              |> Array.map( fun (sentence,classification,matches)-> (sentence,classification) )
+            let sentences = sentenceClassificationTuples |> Array.map fst |> String.concat "\n"
+            let classifications = sentenceClassificationTuples |> Array.map snd |> String.concat "\n"
+            { Input=sentences; Output=classifications }
+          )
+   
       ({model with Results=output}, [])
 
 // View
@@ -155,7 +153,7 @@ let createHead ( model ) =
       match model.Mode with
       | FreeText -> ["Sentence"; "Classification"]
       | TagOnly -> ["Sentence"; "Tagged Sentence"]
-      | TabDelimited -> ["TODO"; "TODO"]
+      | TabDelimited -> ["Sentences"; "Classifications"]
     thead [] [
         tr [] [for header in headers do
                 yield th [] [str header]]
@@ -165,30 +163,12 @@ let view model dispatch =
   div [ ClassName "columns is-vcentered" ] [ 
     div [ ClassName "column" ] [ 
       h1 [ ClassName "title"] [ str "Question Classifier"]
-      //https://github.com/fable-compiler/repl/blob/master/public/samples/fulma/dropdown.fs
-      //https://github.com/MangelMaxime/fulma-demo/blob/master/src/App.fsDropdown.dropdown [ Dropdown.IsHoverable ]
-        // [ div [ ]
-        //     [ Button.button [ ]
-        //         [ span [ ]
-        //             [ str "Mode" ]
-        //           Icon.icon [ Icon.Size IsSmall ]
-        //             [ Fa.i [ Fa.Solid.AngleDown ]
-        //                 [ ] ] ] ]
-        //   Dropdown.menu [ ]
-        //     [ Dropdown.content [ ]
-        //         [ Dropdown.Item.a [ Dropdown.Item.IsActive true ]
-        //             [ str "Free text" ]
-        //           Dropdown.Item.a [ ]
-        //             [ str "Tab delimited" ]
-        //           Dropdown.Item.a [  ]
-        //             [ str "Tag only" ]
-        // ] ] ]
       Field.div [ ]
                 [ Label.label [ ]
                     [ str "Mode" ]
                   Control.div [ ]
                      [ Select.select [  ]
-                        [ select [ DefaultValue model.Mode ; OnChange (fun ev  -> ModeChange( ev.Value ) |> dispatch) ]
+                        [ select [ DefaultValue model.Mode ; OnChange (fun ev  -> ModeChange( !!ev.Value ) |> dispatch) ]
                             [ option [ Value Mode.FreeText ] [ str "Free text" ]
                               option [ Value Mode.TabDelimited ] [ str "Tab delimited" ]
                               option [ Value Mode.TagOnly ] [ str "Tag only" ] ] ] ] ]
@@ -202,7 +182,7 @@ let view model dispatch =
                         Width "100%"
                         Height "200px"
                     ] 
-                    OnInput (fun ev ->  UpdateInput (!!ev.target?value) |> dispatch )
+                    OnInput (fun ev ->  UpdateInput (ev.target?value) |> dispatch )
                 ] []
         simpleButton "Go" ProcessInput dispatch
         hr []
@@ -222,11 +202,6 @@ let view model dispatch =
     ]
   ]  
 
-//test shim
-// let NothingCallback (f:float) = ()
-// let NothingRequest (callback: float -> unit) = 1.0
-// window.requestAnimationFrame <- NothingRequest
-
 // App
 Program.mkProgram init update view
 //|> Program.toNavigable (parseHash pageParser) urlUpdate
@@ -234,5 +209,5 @@ Program.mkProgram init update view
 |> Program.withDebugger
 //|> Program.withHMR
 #endif
-|> Program.withReactBatched "elmish-app" //?withReactSynchronous?
+|> Program.withReactBatched "elmish-app" //withReactBatched //withReactSynchronous fails
 |> Program.run

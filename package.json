@@ -4,7 +4,7 @@
   "description": "Question classifier, Olney et al (2003) reboot",
   "scripts": {
     "start": "webpack-dev-server",
-    "publish": "gh-pages -d public",
+    "publish": "gh-pages -d deploy",
     "deploy": "webpack -p",
     "node-build": "fable-splitter src -o node-build --commonjs",
     "pretest": "fable-splitter tests -o test-build --commonjs",

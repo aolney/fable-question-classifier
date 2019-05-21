@@ -1,28 +1,28 @@
 # Question Classifier 2003 Reboot
 
-## STATUS: IN PROGRESS/NOT FUNCTIONAL
-
 This code is a reimplementation of [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) written in `tcl`.
 The goal here is not to improve upon that work but to get as reasonably close to it as possible. 
 Any improvements will appear in other repositories.
 
-Ideas from this work have been [used recently but within a machine learning framework](https://olney.ai/category/2018/11/05/kellyer.html).
-
 The history of this code is somewhat unfortunate, as this was pre-PhD code with poor development organization. 
-So it is rather difficult for me to say that this code would replicate the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html).
+So it is rather difficult for me to say this code exactly replicates the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html).
 The primary reasons are:
 
 - I'm not 100% sure if I even found the correct original `tcl` code
 - The code has been translated from `tcl` native regex to `f#`
 - The original code used the [Brill Tagger](https://en.wikipedia.org/wiki/Brill_tagger) as a preprocessing step, and I have replaced that with [a javascript implementation](https://github.com/NaturalNode/natural) that may perform differently, affecting my program's results.
 
-Some tests have been added that compare performance of the `tcl` code I found to this reimplementation, for comparison.
+However, because the reimplementation's regular expressions are basically the same and because tests comparing the `tcl` code above to this reimplementation have largely similar results, I believe this code is a valid reimplementation. 
 
-All that being said, please cite the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) when using this code but also please state that it is a reimplementation. 
+Accordingly, please cite the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) when using this code, but also please state that it is a reimplementation. 
+
+More recent work has used these ideas [within a machine learning framework](https://olney.ai/category/2018/11/05/kellyer.html).
+
+A live demonstration is available at https://olney.ai/question-classifier-2003-reboot/
 
 ------------------------------
 
-## Requirements
+## Development requirements
 
 * [dotnet SDK](https://www.microsoft.com/net/download/core) 2.1 or higher
 * [node.js](https://nodejs.org) with [npm](https://www.npmjs.com/)
@@ -60,11 +60,11 @@ Last but not least, in the `.fsproj` file you can find a new node: `	<Import Pro
 
 ### Fable-splitter
 
-[Fable-splitter]() is a standalone tool which outputs separated files instead of a single bundle. Here all the js files are put into the `build`  dir. And the main entry point is our `App.js` file.
+[Fable-splitter]() is a standalone tool which outputs separated files instead of a single bundle. Here all the js files are put into the `test-build` or `node-build`  dir. And the main entry point is our `App.js` file.
 
 ### Webpack
 
-[Webpack](https://webpack.js.org) is a JS bundler with extensions, like a static dev server that enables hot reloading on code changes. Fable interacts with Webpack through the `fable-loader`. Configuration for Webpack is defined in the `webpack.config.js` file. Note this sample only includes basic Webpack configuration for development mode, if you want to see a more comprehensive configuration check the [Fable webpack-config-template](https://github.com/fable-compiler/webpack-config-template/blob/master/webpack.config.js).
+[Webpack](https://webpack.js.org) is a JS bundler with extensions, like a static dev server that enables hot reloading on code changes. Fable interacts with Webpack through the `fable-loader`. Configuration for Webpack is defined in the `webpack.config.js` file. Note this sample only includes basic Webpack configuration for development mode, if you want to see a more comprehensive configuration check the [Fable webpack-config-template](https://github.com/fable-compiler/webpack-config-template/blob/master/webpack.config.js). Deployment uses Webpack to populate the `deploy` directory and then pushes that directory to `gh-pages`.
 
 ### Web assets
 
