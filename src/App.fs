@@ -162,7 +162,7 @@ let createHead ( model ) =
 let view model dispatch =
   div [ ClassName "columns is-vcentered" ] [ 
     div [ ClassName "column" ] [ 
-      h1 [ ClassName "title"] [ str "Question Classifier"]
+      h1 [ ClassName "title"] [ str "Question Classifier 2003 Reboot"]
       Field.div [ ]
                 [ Label.label [ ]
                     [ str "Mode" ]
@@ -173,7 +173,7 @@ let view model dispatch =
                               option [ Value Mode.TabDelimited ] [ str "Tab delimited" ]
                               option [ Value Mode.TagOnly ] [ str "Tag only" ] ] ] ] ]
       div [ ClassName "content"] [
-        p [] [ str "Enter your text here. In Free text mode, sentences will be tokenized using simple punctuation and individually classified. In Tab delimited mode, it will be treated as tab delimited with the last column as text input. Your results will appear below the 'Go' button and can be copy/pasted to spreadsheet software." ]
+        p [] [ str "Enter your text below. In Free text mode, sentences will be tokenized using simple punctuation and individually classified. In Tab delimited mode, it will be treated as tab delimited with the last column as text input. Your results will appear below the 'Go' button and can be copy/pasted to spreadsheet software. Click on the cat in the corner for more information." ]
         textarea [
                     ClassName "input"
                     DefaultValue model.InputText
