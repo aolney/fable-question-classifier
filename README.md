@@ -1,5 +1,7 @@
 # Question Classifier 2003 Reboot
 
+[![DOI](https://zenodo.org/badge/162049270.svg)](https://zenodo.org/badge/latestdoi/162049270)
+
 This code is a reimplementation of [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) written in `tcl`.
 The goal here is not to improve upon that work but to get as reasonably close to it as possible. 
 Any improvements will appear in other repositories.
@@ -14,7 +16,7 @@ The primary reasons are:
 
 However, because the reimplementation's regular expressions are basically the same and because tests comparing the `tcl` code above to this reimplementation have largely similar results, I believe this code is a valid reimplementation. 
 
-Accordingly, please cite the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) when using this code, but also please state that it is a reimplementation. 
+Accordingly, please cite the [work from 2003](https://olney.ai/category/2003/01/01/Olney-A-Louwerse-M-Mathews-E-M.html) when using this code as well as the citation for the latest code release [provided by Zenodo](https://zenodo.org/badge/latestdoi/162049270).
 
 More recent work has used these ideas [within a machine learning framework](https://olney.ai/category/2018/11/05/kellyer.html).
 
